@@ -1,0 +1,4 @@
+# NodeJS specific #
+node_modules/
+package-lock.json
+dist/
