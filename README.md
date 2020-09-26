@@ -1,10 +1,10 @@
 ## initialization
 
-```Install dependencies
+``` Install dependencies
 npm install
 
-```Convert typescript to javascript 
+Convert typescript to javascript 
 tsc -w
 
-```Start api
+Start api
 node dist/index.js

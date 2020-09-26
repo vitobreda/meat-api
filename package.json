@@ -1,7 +1,7 @@
 {
-  "name": "api-meet",
+  "name": "meat-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Api do curso Do Zero à Nuvem API Restful com NodeJS, Restify e MongoDB",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
