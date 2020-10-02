@@ -3,6 +3,7 @@
     "outDir": "dist",
     "target": "es6",
     "module": "CommonJS",
-    "sourceMap": true,
-  }
+    "sourceMap": true
+  },
+  "exclude": ["**/*.test.ts"]
 }
