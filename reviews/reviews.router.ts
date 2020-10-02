@@ -1,21 +1,35 @@
-import { ModelRouter } from '../common/model-router'
-import * as restify from 'restify'
-import { NotFoundError } from 'restify-errors'
-import { Review } from './reviews.model'
-import * as mongoose from 'mongoose'
+import { ModelRouter } from "../common/model-router";
+import * as restify from "restify";
+import { Review } from "./reviews.model";
+import * as mongoose from "mongoose";
 
-class ReviewsRouter extends ModelRouter<Review>{
-    constructor() {
-        super(Review)
-    }
+class ReviewsRouter extends ModelRouter<Review> {
+  constructor() {
+    super(Review);
+  }
 
-    protected prepareOne(query: mongoose.DocumentQuery<Review, Review>): mongoose.DocumentQuery<Review, Review> {
-        return query
-            .populate('restaurant', 'name')
-            .populate('user', 'name')
-    }
+  envelope(document) {
+    let resource = super.envelope(document);
 
-    /*findById = (req, resp, next) => {
+    const restId = document.restaurant._id
+      ? document.restaurant._id
+      : document.restaurant;
+
+    const userId = document.user._id ? document.user._id : document.user;
+
+    resource._links.restaurant = `/restaurants/${restId}`;
+    resource._links.user = `/users/${userId}`;
+
+    return resource;
+  }
+
+  protected prepareOne(
+    query: mongoose.DocumentQuery<Review, Review>
+  ): mongoose.DocumentQuery<Review, Review> {
+    return query.populate("restaurant", "name").populate("user", "name");
+  }
+
+  /*findById = (req, resp, next) => {
         this.model.findById(req.params.id)
             .populate('restaurant', 'name')
             .populate('user', 'name')
@@ -23,16 +37,21 @@ class ReviewsRouter extends ModelRouter<Review>{
             .catch(next)
     }*/
 
-    applyRoutes(application: restify.Server) {
+  applyRoutes(application: restify.Server) {
+    application.get({ path: `${this.basePath}` }, this.findAll);
 
-        application.get('/reviews', this.findAll)
+    application.get({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.findById,
+    ]);
 
-        application.get('/reviews/:id', [this.validateId, this.findById])
+    application.post({ path: `${this.basePath}` }, this.save);
 
-        application.post('/reviews', this.save)
-
-        application.del('/reviews/:id', [this.validateId, this.delete])
-    }
+    application.del({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.delete,
+    ]);
+  }
 }
 
-export const reviewsRouter = new ReviewsRouter()
+export const reviewsRouter = new ReviewsRouter();

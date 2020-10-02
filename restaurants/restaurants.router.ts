@@ -1,60 +1,94 @@
-import { ModelRouter } from '../common/model-router'
-import * as restify from 'restify'
-import { NotFoundError } from 'restify-errors'
-import { Restaurant } from './restaurants.model'
+import { ModelRouter } from "../common/model-router";
+import * as restify from "restify";
+import { NotFoundError } from "restify-errors";
+import { Restaurant } from "./restaurants.model";
 
 class RestaurantsRouter extends ModelRouter<Restaurant> {
+  constructor() {
+    super(Restaurant);
+  }
 
-    constructor() {
-        super(Restaurant)
-    }
+  envelope(document) {
+    let resource = super.envelope(document);
 
-    findMenu = (req, res, next) => {
-        Restaurant.findById(req.params.id, "+menu")
-            .then(rest => {
-                if (!rest) {
-                    throw new NotFoundError('Restaurant not found')
-                } else {
-                    res.json(rest.menu)
-                    return (next)
-                }
-            })
-            .catch(next)
-    }
+    resource._links.menu = `${this.basePath}/${resource._id}/menu`;
 
-    replaceMenu = (req, res, next) => {
-        Restaurant.findById(req.params.id).then(rest => {
-            if (!rest) {
-                throw new NotFoundError('Restaurant not found')
-            } else {
-                rest.menu = req.body // array de MenuItem
-                return rest.save()
-            }
-        }).then(rest => {
-            res.json(rest.menu)
-            return next
-        })
-        .catch(next)
-    }
+    return resource;
+  }
 
-    applyRoutes(application: restify.Server) {
+  findMenu = (
+    req: restify.Request,
+    res: restify.Response,
+    next: restify.Next
+  ) => {
+    Restaurant.findById(req.params.id, "+menu")
+      .then((rest) => {
+        if (!rest) {
+          throw new NotFoundError("Restaurant not found");
+        } else {
+          res.json(rest.menu);
+          return next;
+        }
+      })
+      .catch(next);
+  };
 
-        application.get('/restaurants', this.findAll)
+  replaceMenu = (
+    req: restify.Request,
+    res: restify.Response,
+    next: restify.Next
+  ) => {
+    Restaurant.findById(req.params.id)
+      .then((rest) => {
+        if (!rest) {
+          throw new NotFoundError("Restaurant not found");
+        } else {
+          rest.menu = req.body; // array de MenuItem
+          return rest.save();
+        }
+      })
+      .then((rest) => {
+        res.json(rest.menu);
+        return next;
+      })
+      .catch(next);
+  };
 
-        application.get('/restaurants/:id', [this.validateId, this.findById])
+  applyRoutes(application: restify.Server) {
+    application.get({ path: `${this.basePath}` }, this.findAll);
 
-        application.post('/restaurants', this.save)
+    application.get({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.findById,
+    ]);
 
-        application.put('/restaurants/:id', [this.validateId, this.replace])
+    application.post({ path: `${this.basePath}` }, this.save);
 
-        application.patch('/restaurants/:id', [this.validateId, this.update])
+    application.put({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.replace,
+    ]);
 
-        application.del('/restaurants/:id', [this.validateId, this.delete])
+    application.patch({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.update,
+    ]);
 
-        application.get("/restaurants/:id/menu", [this.validateId, this.findMenu])
+    application.del({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.delete,
+    ]);
 
-        application.put("/restaurants/:id/menu", [this.validateId, this.replaceMenu])
-    }
+    application.get({ path: `${this.basePath}/:id/menu` }, [
+      this.validateId,
+      this.findMenu,
+    ]);
+
+    application.put({ path: `${this.basePath}/:id/menu` }, [
+      this.validateId,
+      this.replaceMenu,
+    ]);
+  }
 }
 
-export const restaurantsRouter = new RestaurantsRouter()
+export const restaurantsRouter = new RestaurantsRouter();

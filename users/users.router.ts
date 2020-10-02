@@ -1,30 +1,40 @@
-import * as restify from 'restify'
-import { User } from './users.model'
-import { NotFoundError } from 'restify-errors'
-import { ModelRouter } from '../common/model-router'
+import * as restify from "restify";
+import { User } from "./users.model";
+import { ModelRouter } from "../common/model-router";
 
 class UsersRouter extends ModelRouter<User> {
+  constructor() {
+    super(User);
+    this.on("beforeRender", (document) => {
+      document.password = undefined;
+    });
+  }
 
-    constructor() {
-        super(User)
-        this.on('beforeRender', document => {
-            document.password = undefined
-        })
-    }
+  applyRoutes(application: restify.Server) {
+    application.get({ path: `${this.basePath}` }, this.findAll);
 
-    applyRoutes(application: restify.Server) {
-        application.get('/users', this.findAll)
+    application.get({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.findById,
+    ]);
 
-        application.get('/users/:id', [this.validateId, this.findById])
+    application.post({ path: `${this.basePath}` }, this.save);
 
-        application.post('/users', this.save)
+    application.put({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.replace,
+    ]);
 
-        application.put('/users/:id', [this.validateId, this.replace])
+    application.patch({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.update,
+    ]);
 
-        application.patch('/users/:id', [this.validateId, this.update])
-
-        application.del('/users/:id', [this.validateId, this.delete])
-    }
+    application.del({ path: `${this.basePath}/:id` }, [
+      this.validateId,
+      this.delete,
+    ]);
+  }
 }
 
-export const usersRouter = new UsersRouter()
+export const usersRouter = new UsersRouter();
