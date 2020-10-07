@@ -3,7 +3,6 @@ import * as request from "supertest";
 import { environment } from "../common/environment";
 
 let address: string = (<any>global).address;
-console.log("endereço: ", address);
 
 test("get /users", () => {
   return request("http://localhost:3001")
