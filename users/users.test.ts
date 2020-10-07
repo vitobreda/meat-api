@@ -3,9 +3,10 @@ import * as request from "supertest";
 import { environment } from "../common/environment";
 
 let address: string = (<any>global).address;
+console.log("endereço: ", address);
 
 test("get /users", () => {
-  return request(address)
+  return request("http://localhost:3001")
     .get("/users")
     .then((response) => {
       expect(response.status).toBe(200);
@@ -14,7 +15,7 @@ test("get /users", () => {
     .catch(fail);
 });
 
-test.only("post /users", () => {
+test("post /users", () => {
   return request(address)
     .post("/users")
     .send({
@@ -23,7 +24,6 @@ test.only("post /users", () => {
       password: "123456",
     })
     .then((response) => {
-      console.log("response post", response.body);
       expect(response.status).toBe(200);
       expect(response.body._id).toBeDefined();
       expect(response.body.name).toBe("usuario1");
