@@ -1,6 +1,7 @@
 import * as restify from "restify";
 import { User } from "./users.model";
 import { ModelRouter } from "../common/model-router";
+import { authenticate } from "../security/auth.handler";
 
 class UsersRouter extends ModelRouter<User> {
   constructor() {
@@ -34,6 +35,7 @@ class UsersRouter extends ModelRouter<User> {
       this.validateId,
       this.delete,
     ]);
+    application.post({ path: `${this.basePath}/authenticate` }, authenticate);
   }
 }
 
