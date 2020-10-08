@@ -12,6 +12,7 @@ tsc -w
 
 Start api
 node dist/index.js
+```
 
 ## test
 
@@ -19,4 +20,8 @@ api test are implemented with jest and supertest
 
 ## run test
 
+```
+
 npm test
+
+```
