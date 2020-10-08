@@ -3,10 +3,12 @@ import * as request from "supertest";
 import { environment } from "../common/environment";
 
 let address: string = (<any>global).address;
+let token: string = (<any>global).token;
 
 test("get /users", () => {
   return request("http://localhost:3001")
     .get("/users")
+    .set('Authorization', token)
     .then((response) => {
       expect(response.status).toBe(200);
       expect(response.body.items).toBeInstanceOf(Array);

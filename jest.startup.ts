@@ -21,6 +21,15 @@ const beforeAllTests = () => {
       console.log("Server is listening on: ", server.application.address())
     )
     .then(() => User.deleteMany({}))
+    .then(() => {
+      let admin = new User()
+      admin.name = 'admin';
+      admin.email = 'admin@email.com'
+      admin.password = '123456'
+      admin.profiles = ['admin', 'user']
+
+      return admin.save()
+    })
     .then(() => Review.deleteMany({}));
 };
 
